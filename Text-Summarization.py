@@ -1,5 +1,13 @@
+#############################################################
+# Text Summarizer ( Project Code AC01 )                     #
+# Team Members ( **Team ID** 1959 )                         #
+#   * Lakshay Virmani [lakshayvirmani77@gmail.com]          #
+#   * Utkarsh Kulshrestha [utkarshkulshrestha0@gmail.com]   #
+#   * Mohit Nagpal [nagpalm7@gmail.com]                     #
+#############################################################
+# Import Attention layer from custom module
 from Attention import AttentionLayer
-
+# Import packages
 import numpy as np
 import pandas as pd
 import re
@@ -16,8 +24,11 @@ from nltk import word_tokenize
 nltk.download('all')
 from nltk.corpus import stopwords
 warnings.filterwarnings("ignore")
-
-#Data Pre-processing
+###############################################
+# Data Pre-processing
+###############################################
+# Helper function to clean data (remove punctuation marks 
+# and converting to lower case)
 def text_clean(text,n):
   processed_string=text.lower()
   processed_string=re.sub(r'[^\w\s]','',processed_string)
@@ -35,7 +46,7 @@ def text_clean(text,n):
             long_words.append(i)   
   return (" ".join(long_words)).strip()
 
-#Data importing and passing it for text cleaning
+# Import and clean data
 data=pd.read_csv("Reviews.csv",nrows=20000)
 cleaned_text=[]
 cleaned_summary=[]
@@ -66,8 +77,6 @@ data['cleaned_summary']=cleaned_summary
 
 max_length_text=30
 max_summary_len=8
-
-
 
 len(cleaned_text)
 len(cleaned_summary)
