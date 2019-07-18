@@ -153,8 +153,8 @@ y_tokenizer.fit_on_texts((y_train))
 y_tr_seq=x_tokenizer.texts_to_sequences(y_train)
 y_val_seq=x_tokenizer.texts_to_sequences(y_test)
 
-y_train  = pad_sequences(x_tr_seq,  maxlen=max_length_summary, padding='post')
-y_test   = pad_sequences(x_val_seq, maxlen=max_length_summary, padding='post')
+y_train  = pad_sequences(x_tr_seq,  maxlen=max_summary_len, padding='post')
+y_test   = pad_sequences(x_val_seq, maxlen=max_summary_len, padding='post')
 
 
 y_voc=len(y_tokenizer.word_index) + 1
