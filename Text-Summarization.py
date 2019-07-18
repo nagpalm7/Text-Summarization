@@ -77,7 +77,7 @@ len(cleaned_summary)
 short_text=[]
 short_summary=[]
 for i in range(0,len(cleaned_text)):
-  if(len(cleaned_summary[i].split())<=max_length_summary and len(cleaned_text[i].split())<=max_length_text):
+  if(len(cleaned_summary[i].split())<=max_summary_len and len(cleaned_text[i].split())<=max_length_text):
     short_text.append(cleaned_text[i])
     short_summary.append(cleaned_summary[i])
     
