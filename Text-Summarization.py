@@ -1,13 +1,5 @@
-#############################################################
-# Text Summarizer ( Project Code AC01 )                     #
-# Team Members ( **Team ID** 1959 )                         #
-#   * Lakshay Virmani [lakshayvirmani77@gmail.com]          #
-#   * Utkarsh Kulshrestha [utkarshkulshrestha0@gmail.com]   #
-#   * Mohit Nagpal [nagpalm7@gmail.com]                     #
-#############################################################
-# Import Attention layer from custom module
 from Attention import AttentionLayer
-# Import packages
+#Importing all the dependencies
 import numpy as np
 import pandas as pd
 import re
@@ -24,16 +16,11 @@ from nltk import word_tokenize
 nltk.download('all')
 from nltk.corpus import stopwords
 warnings.filterwarnings("ignore")
-###############################################
-# Data Pre-processing
-###############################################
-# Helper function to clean data (remove punctuation marks 
-# and converting to lower case)
+
+#Data Pre-processing Function which will be used later by input data
 def text_clean(text,n):
   processed_string=text.lower()
   processed_string=re.sub(r'[^\w\s]','',processed_string)
-  
- #word_tokens=word_tokenize(processed_string)
   stop_words = set(stopwords.words('english'))
   new=processed_string.split()
   tokens=[]
@@ -41,12 +28,13 @@ def text_clean(text,n):
     if w not in stop_words:
       tokens.append(w)
   long_words=[]
+  #removing short words
   for i in tokens:
-        if len(i)>1:                                                 #removing short word
+        if len(i)>1:                                                 
             long_words.append(i)   
   return (" ".join(long_words)).strip()
 
-# Import and clean data
+#Data importing and passing the text and summary columns for text cleaning and pre-processing
 data=pd.read_csv("Reviews.csv",nrows=20000)
 cleaned_text=[]
 cleaned_summary=[]
@@ -72,15 +60,20 @@ print(data['Text'][0])
 print(cleaned_summary[0])
 print(data['Summary'][0])
 
+#dataframe columns for cleaned text and summary
 data['cleaned_text']=cleaned_text
 data['cleaned_summary']=cleaned_summary
 
+#specifying the maximum length of text and summary
 max_length_text=30
 max_summary_len=8
+
+
 
 len(cleaned_text)
 len(cleaned_summary)
 
+#Storing the texts and summaries which are less than the specified maximum length
 short_text=[]
 short_summary=[]
 for i in range(0,len(cleaned_text)):
@@ -89,18 +82,19 @@ for i in range(0,len(cleaned_text)):
     short_summary.append(cleaned_summary[i])
     
 df=pd.DataFrame({"text":short_text,"summary":short_summary})
-
+#Applying start and end tokens to the short text and short summary dataframe
 df['summary'] = df['summary'].apply(lambda x : 'sostok '+ x + ' eostok')
 
 from sklearn.model_selection import train_test_split
 X_train, X_test, y_train, y_test = train_test_split(np.array(df['text']),np.array(df['summary']),test_size=0.1,random_state=0,shuffle=True)
 
+#Tokenizing the text files using Tokenizer()
 from keras.preprocessing.text import Tokenizer 
 from keras.preprocessing.sequence import pad_sequences
 x_tokenizer=Tokenizer()
 x_tokenizer.fit_on_texts((X_train))
 
-#Definings rare words
+#Definings rare words for text files which will not be used in our training
 threshold=4
 count=0
 tot_count=0
@@ -115,10 +109,10 @@ for key,value in x_tokenizer.word_counts.items():
     count=count+1
     frequency=frequency+value
     
-common_words=tot_count-count
+common_words=tot_count-count  #Common words are total-rare words and will be used for our training
 print(tot_frequency)
 
-#Now we will prepare the tokenizer only for the topmost common words which are not rare
+#Preparing the tokenizer only for the topmost common words which are not rare
 
 x_tokenizer=Tokenizer(common_words)
 
@@ -134,6 +128,8 @@ X_test   = pad_sequences(x_val_seq, maxlen=max_length_text, padding='post')
 
 x_voc=len(x_tokenizer.word_index) + 1
 
+
+#Tokenizing the summary files using Tokenizer()
 y_tokenizer=Tokenizer()
 y_tokenizer.fit_on_texts((y_train))
 threshold=6
@@ -178,6 +174,7 @@ y_train=np.delete(y_train,ind, axis=0)
 X_train=np.delete(X_train,ind, axis=0)
 
 
+
 ind=[]
 for i in range(len(y_test)):
     cnt=0
@@ -196,7 +193,7 @@ latent_dim=300
 embedding_dim=100
 
 
-
+# DEFINING THE ENCODER AND DECODER FOR TRAINING
 #Encoder
 encoder_inputs=Input(shape=(max_length_text,))
 
@@ -254,7 +251,7 @@ model.compile(optimizer='rmsprop', loss='sparse_categorical_crossentropy')
 
 
 
-
+#Early stopping based on validation error
 es = EarlyStopping(monitor='val_loss', mode='min', verbose=1,patience=2)
 
 model.fit([X_train,y_train[:,:-1]], y_train.reshape(y_train.shape[0],y_train.shape[1], 1)[:,1:] ,epochs=3,callbacks=[es],batch_size=64, validation_data=([X_test,y_test[:,:-1]], y_test.reshape(y_test.shape[0],y_test.shape[1], 1)[:,1:]))
