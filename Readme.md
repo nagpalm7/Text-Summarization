@@ -2,8 +2,11 @@
 A seq-seq model with attention mechanism which produces short summaries for large texts. We have defined the training and the inference portion for the Encoder-Decoder based seq-seq model in our code. 
 
 During pre-processing, we have converted all the text to lower case and removed all the punctuation marks, stop words and short words.
+
 The cleaned text and summaries are added as dataframe columns. 
+
 For the decoder section, we have added the start and end tokens to our cleaned summary files.
+
 Tokenization is used to convert the sequences to words, calculate the overall vocabulary and use of rare words in the clean text and clean summary.
 While converting the vocabularies into word embeddings we have used a 100 dimenional vector for each word in our model. 
 
