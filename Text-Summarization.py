@@ -47,12 +47,7 @@ for i in range(0,20000):
 #Tokenization of sentences
 ##Sentences tokenized into words and stored in a list
 #from nltk.tokenize import word_tokenize
-#words=[]
-#for i in range(0,5000):
- # words.append(word_tokenize(string[i]))
-  
-#print(len(words))
-#print(len(words[0]))
+
 
 print(cleaned_text[0])
 print(data['Text'][0])
@@ -82,6 +77,7 @@ for i in range(0,len(cleaned_text)):
     short_summary.append(cleaned_summary[i])
     
 df=pd.DataFrame({"text":short_text,"summary":short_summary})
+
 #Applying start and end tokens to the short text and short summary dataframe
 df['summary'] = df['summary'].apply(lambda x : 'sostok '+ x + ' eostok')
 
@@ -104,28 +100,20 @@ common_words=0
 for key,value in x_tokenizer.word_counts.items():
   tot_count=tot_count+1
   tot_frequency=tot_frequency+value
-  
   if(value<threshold):
     count=count+1
-    frequency=frequency+value
-    
+    frequency=frequency+value   
 common_words=tot_count-count  #Common words are total-rare words and will be used for our training
 print(tot_frequency)
 
 #Preparing the tokenizer only for the topmost common words which are not rare
 
 x_tokenizer=Tokenizer(common_words)
-
 x_tokenizer.fit_on_texts((X_train))
-
-
 x_tr_seq=x_tokenizer.texts_to_sequences(X_train)
 x_val_seq=x_tokenizer.texts_to_sequences(X_test)
-
 X_train  = pad_sequences(x_tr_seq,  maxlen=max_length_text, padding='post')
 X_test   = pad_sequences(x_val_seq, maxlen=max_length_text, padding='post')
-
-
 x_voc=len(x_tokenizer.word_index) + 1
 
 
@@ -143,8 +131,7 @@ for key,value in y_tokenizer.word_counts.items():
   tot_freq=tot_freq+value
   if(value<threshold):
     cnt=cnt+1
-    freq=freq+value
-    
+    freq=freq+value  
 common_words=tot_cnt-cnt
 y_tokenizer=Tokenizer(common_words)
 y_tokenizer.fit_on_texts((y_train))
@@ -152,13 +139,12 @@ y_tokenizer.fit_on_texts((y_train))
 
 y_tr_seq=x_tokenizer.texts_to_sequences(y_train)
 y_val_seq=x_tokenizer.texts_to_sequences(y_test)
-
 y_train  = pad_sequences(x_tr_seq,  maxlen=max_summary_len, padding='post')
 y_test   = pad_sequences(x_val_seq, maxlen=max_summary_len, padding='post')
-
-
 y_voc=len(y_tokenizer.word_index) + 1
 y_voc
+
+#Removing those sequences which only contain start and end tokens, both for training and test data
 
 y_tokenizer.word_counts['sostok'],len(y_train)
 ind=[]
@@ -187,21 +173,19 @@ for i in range(len(y_test)):
 y_train=np.delete(y_train,ind, axis=0)
 X_test=np.delete(X_test,ind, axis=0)
 
+
+#Preparing the model
 from keras import backend as K
 K.clear_session()
 latent_dim=300
 embedding_dim=100
 
-
 # DEFINING THE ENCODER AND DECODER FOR TRAINING
 #Encoder
 encoder_inputs=Input(shape=(max_length_text,))
-
 enc_emb=Embedding(x_voc,embedding_dim,trainable=True)(encoder_inputs)
-
 encoder_lstm1=LSTM(latent_dim,return_sequences=True,return_state=True,dropout=0.4,recurrent_dropout=0.4)
 encoder_output1, state_h1, state_c1 = encoder_lstm1(enc_emb)
-
 
 #encoder lstm 2
 encoder_lstm2 = LSTM(latent_dim,return_sequences=True,return_state=True,dropout=0.4,recurrent_dropout=0.4)
@@ -210,7 +194,6 @@ encoder_output2, state_h2, state_c2 = encoder_lstm2(encoder_output1)
 #encoder lstm 3
 encoder_lstm3=LSTM(latent_dim, return_state=True, return_sequences=True,dropout=0.4,recurrent_dropout=0.4)
 encoder_outputs, state_h, state_c= encoder_lstm3(encoder_output2)
-
 
 # Set up the decoder, using `encoder_states` as initial state.
 decoder_inputs = Input(shape=(None,))
@@ -256,6 +239,10 @@ es = EarlyStopping(monitor='val_loss', mode='min', verbose=1,patience=2)
 
 model.fit([X_train,y_train[:,:-1]], y_train.reshape(y_train.shape[0],y_train.shape[1], 1)[:,1:] ,epochs=3,callbacks=[es],batch_size=64, validation_data=([X_test,y_test[:,:-1]], y_test.reshape(y_test.shape[0],y_test.shape[1], 1)[:,1:]))
 
+
+
+
+#Inference Phase: Here we will convert the numerical embeddings back to words
 reverse_target_word_index=y_tokenizer.index_word
 reverse_source_word_index=x_tokenizer.index_word
 target_word_index=y_tokenizer.word_index
@@ -279,6 +266,8 @@ decoder_model = Model(
     [decoder_inputs] + [decoder_hidden_state_input,decoder_state_input_h, decoder_state_input_c],
     [decoder_outputs2] + [state_h2, state_c2])
 
+#Decode Sequence will be used to create the prediction summary.
+# Till the time the function encounters the end token, it will keep on converting and appending the words to prediction summary.
 def decode_sequence(input_seq):
     e_out, e_h, e_c = encoder_model.predict(input_seq)
     
@@ -323,7 +312,7 @@ def seq2text(input_seq):
         if(i!=0):
             newString=newString+reverse_source_word_index[i]+' '
     return newString
-
+#Generating the final sequences
 for i in range(0,100):
     print("Review:",seq2text(X_train[i]))
     print("Original summary:",seq2summary(y_train[i]))
