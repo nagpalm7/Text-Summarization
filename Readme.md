@@ -12,7 +12,7 @@ While converting the vocabularies into word embeddings we have used a 100 dimeni
 
 Training has been done on 20,000 samples and can be modified by the user in the code. 
 
-Towards the conclusion of inference phase, we convert the numerical vectors/embeddings back to our text sequences. These texts are the predicted summaries of our model. 
+Towards the conclusion of inference phase, we convert the numerical vectors/embeddings back to our text sequences. These texts are the predicted summaries of our model. It keeps on appending the predicted words to our decoded sentence till we come across an end token. The words are predicted on the basis of the argmax of the vectors representing them. The word corresponding to the vector with maximum argument is chosen as our prediction.
 
 The Copy of Untitled0.ipynb file consists of the predicted results at the bottom. It can be viewed directly over there.
 
