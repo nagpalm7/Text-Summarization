@@ -12,6 +12,8 @@ While converting the vocabularies into word embeddings we have used a 100 dimeni
 
 Training has been done on 20,000 samples and can be modified by the user in the code. 
 
+Towards the conclusion of inference phase, we convert the numerical vectors/embeddings back to our text sequences. These texts are the predicted summaries of our model. 
+
 The Copy of Untitled0.ipynb file consists of the predicted results at the bottom. It can be viewed directly over there.
 
 LINK TO GOOGLE COLAB CODE: https://colab.research.google.com/drive/1M6nOjr8NeTnRWy5o9rAj0sbtqBVDhFr1
