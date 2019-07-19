@@ -12,6 +12,8 @@ While converting the vocabularies into word embeddings we have used a 100 dimeni
 
 Training has been done on 20,000 samples and can be modified by the user in the code. 
 
+The Copy of Untitled0.ipynb file consists of the predicted results at the bottom. It can be viewed directly over there.
+
 LINK TO GOOGLE COLAB CODE: https://colab.research.google.com/drive/1M6nOjr8NeTnRWy5o9rAj0sbtqBVDhFr1
 While accessing the link, please make sure to upload the dataset file and attention package on Colab.
 
