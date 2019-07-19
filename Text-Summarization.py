@@ -1,3 +1,8 @@
+#TEAM ID: 1959
+#CONTRIBUTORS:
+# 1. UTKARSH KULSHRESTHA: utkarshkulshrestha0@gmail.com
+# 2. MOHIT NAGPAL: nagpalm7@gmail.com
+
 from Attention import AttentionLayer
 #Importing all the dependencies
 import numpy as np
