@@ -291,6 +291,8 @@ def decode_sequence(input_seq):
     while not stop_condition:
       
         output_tokens, h, c = decoder_model.predict([target_seq] + [e_out, e_h, e_c])
+        if(sampled_token_index==0):
+          break;
 
         sampled_token_index = np.argmax(output_tokens[0, -1, :])
         sampled_token = reverse_target_word_index[sampled_token_index]
